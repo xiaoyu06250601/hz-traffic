@@ -1,0 +1,3 @@
+﻿ts,tile_id,rect,eval_status,eval_desc,expedite_pct,congested_pct,blocked_pct,unknown_pct,n_roads
+2026-11-26 12:43:14,C03_滨江,"120.19,30.21 r=4500",2,轻度拥堵,79.45%,4.11%,0.68%,15.76%,131
+2026-11-26 12:43:14,R01_天目山路,天目山路,1,畅通,100.00%,0.00%,0.00%,0.00%,2
