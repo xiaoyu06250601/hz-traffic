@@ -1,0 +1,47 @@
+name: 杭州路况采集
+
+on:
+  schedule:
+    # 每 15 分钟触发一次（UTC 时间，纯周期任务与本地时区无关）
+    - cron: "*/15 * * * *"
+  workflow_dispatch:        # 允许在网页上手动点按运行
+
+permissions:
+  contents: write           # 需要写回 CSV
+
+concurrency:
+  group: hz-traffic-collect
+  cancel-in-progress: false   # 上一轮没跑完时排队，不并发抢配额
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+
+      - name: 准备 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 采集一轮
+        env:
+          AMAP_KEY: ${{ secrets.AMAP_KEY }}
+        run: python collect.py --once
+
+      - name: 提交数据
+        if: always()
+        run: |
+          git config user.name  "hz-traffic-bot"
+          git config user.email "hz-traffic-bot@users.noreply.github.com"
+          mkdir -p data logs
+          git add -A data logs
+          if git diff --staged --quiet; then
+            echo "本轮无新增数据，跳过提交"
+          else
+            git commit -m "data: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') 路况快照"
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+            git push
+          fi
