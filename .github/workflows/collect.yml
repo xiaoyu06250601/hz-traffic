@@ -3,7 +3,7 @@ name: 杭州路况采集
 on:
   schedule:
     # 每 15 分钟触发一次（UTC 时间，纯周期任务与本地时区无关）
-    - cron: "*/15 * * * *"
+    - cron: "7,22,37,52 * * * *"
   workflow_dispatch:        # 允许在网页上手动点按运行
 
 permissions:
